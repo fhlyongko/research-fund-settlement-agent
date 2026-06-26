@@ -277,6 +277,9 @@ function scoreDocument(document, terms, query, topic) {
   const haystack = `${title} ${unit} ${text}`.toLowerCase();
   const compactHaystack = normalize(haystack);
   const compactQuery = normalize(query);
+  const compactTitle = normalize(title);
+  const compactUnit = normalize(unit);
+  const compactTitleUnit = normalize(`${title} ${unit}`);
   let score = document.sourceType === "verified" ? 28 : 0;
 
   terms.forEach((term) => {
@@ -285,12 +288,23 @@ function scoreDocument(document, terms, query, topic) {
     if (!compact) return;
     score += countOccurrences(haystack, lower) * 4;
     if (compactHaystack.includes(compact)) score += 3;
-    if (normalize(title).includes(compact)) score += 14;
-    if (normalize(unit).includes(compact)) score += 8;
+    if (compactTitle.includes(compact)) score += 14;
+    if (compactUnit.includes(compact)) score += 8;
   });
 
+  const officialQuery =
+    /(2026|연구재단|정부연구비|사용기준|교육자료|Q&A|상세정산|지적사례|연구지원INFO)/i.test(query) ||
+    /(회의비|사전결재|사전내부결재|연구재료비|검수|논문게재료|정산|증빙)/.test(query);
+
+  if (officialQuery) {
+    if (/2026년한국연구재단권역별연구개발비교육자료/.test(compactTitle)) score += 220;
+    if (/2026년정부연구비사용q/.test(compactTitle)) score += 220;
+    if (/2025실시대학재정지원사업비상세정산/.test(compactTitle)) score += 160;
+    if (/연구지원info2026622/.test(compactTitle)) score += 130;
+    if (/26년해외출장|jalt2026|출장정리/.test(compactTitle)) score -= 90;
+  }
+
   if (topic) {
-    const compactTitleUnit = normalize(`${title} ${unit}`);
     if (topic.id === "domesticTravel") {
       if (/(국내출장|국내여비|국내학회|관내출장|관외출장)/.test(compactTitleUnit)) score += 160;
       if (/(해외출장|국외출장|국외여비|공무국외)/.test(compactTitleUnit)) score -= 160;
@@ -298,6 +312,21 @@ function scoreDocument(document, terms, query, topic) {
     if (topic.id === "internationalTravel") {
       if (/(해외출장|국외출장|국외여비|공무국외)/.test(compactTitleUnit)) score += 160;
       if (/(국내출장|국내여비|국내학회|관내출장|관외출장)/.test(compactTitleUnit)) score -= 160;
+    }
+    if (topic.id === "meeting") {
+      if (/2026년한국연구재단권역별연구개발비교육자료/.test(compactTitle)) score += 260;
+      if (/회의비사용기준변경|사전내부결재폐지|같은연구개발기관/.test(compactHaystack)) score += 120;
+      if (/26년해외출장|jalt2026|출장정리/.test(compactTitle)) score -= 120;
+    }
+    if (topic.id === "material") {
+      if (/2026년정부연구비사용q/.test(compactTitle)) score += 260;
+      if (/연구재료구입시증명자료생략가능|100만원이하|검수절차간소화/.test(compactHaystack)) score += 140;
+      if (/26년해외출장|jalt2026|출장정리/.test(compactTitle)) score -= 120;
+    }
+    if (topic.id === "publication") {
+      if (/2026년정부연구비사용q/.test(compactTitle)) score += 280;
+      if (/논문게재료과제종료후2년|연구개발기간종료일로부터2년|논문게재료/.test(compactHaystack)) score += 120;
+      if (/26년해외출장|jalt2026|출장정리/.test(compactTitle)) score -= 120;
     }
 
     (topic.boostTerms || []).forEach((term) => {
