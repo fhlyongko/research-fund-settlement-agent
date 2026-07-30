@@ -59,3 +59,22 @@ for (const [query, expected] of cases) {
 }
 
 if (failed) process.exit(1);
+
+sandbox.testDocuments = JSON.parse(fs.readFileSync("data/kb-index.json", "utf8")).documents;
+vm.runInContext("state.documents = testDocuments", sandbox);
+
+const travelResults = vm.runInContext(
+  `searchDocuments("출장 여비 정산시 필요한 서류 알려줘", 8, detectTopic("출장 여비 정산시 필요한 서류 알려줘"))`,
+  sandbox,
+);
+
+if (travelResults[0]?.sourceType !== "verified") {
+  console.error(`FAIL travel search did not prioritize verified guidance: ${travelResults[0]?.title || "none"}`);
+  process.exit(1);
+}
+if (travelResults.some((result) => String(result.id || "").startsWith("TRAVEL_EXPENSE_FILE:"))) {
+  console.error("FAIL private travel source appeared in public search results");
+  process.exit(1);
+}
+
+console.log(`PASS travel source ranking: ${travelResults[0].title}`);

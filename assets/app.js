@@ -367,7 +367,7 @@ function scoreDocument(document, terms, query, topic) {
   const compactTitle = normalize(title);
   const compactUnit = normalize(unit);
   const compactTitleUnit = normalize(`${title} ${unit}`);
-  let score = document.sourceType === "verified" ? 28 : 0;
+  let score = document.sourceType === "verified" ? 500 : 0;
 
   terms.forEach((term) => {
     const lower = term.toLowerCase();

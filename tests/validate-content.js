@@ -11,6 +11,12 @@ if (!html.includes('lang="ko"')) errors.push("Korean language declaration is mis
 if (!Array.isArray(kb.documents) || kb.documents.length !== kb.documentCount) {
   errors.push(`Knowledge-base count mismatch: documents=${kb.documents?.length}, declared=${kb.documentCount}`);
 }
+if (kb.documents.some((document) => String(document.id || "").startsWith("TRAVEL_EXPENSE_FILE:"))) {
+  errors.push("Private travel-expense source is present in the public knowledge base.");
+}
+if (kb.documents.some((document) => String(document.title || "").includes("26년 해외출장 정리"))) {
+  errors.push("Private travel summary is present in the public knowledge base.");
+}
 
 const raw = JSON.stringify(kb);
 const sensitivePatterns = [
