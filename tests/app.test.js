@@ -45,6 +45,8 @@ const cases = [
   ["논문게재료 APC 연구기간 종료 후 정산", "publication"],
   ["맥미니 200만원 중앙구매 절차", "equipment"],
   ["내년도 예산을 올해 미리 당겨서 사용할 수 있나", "budgetAdvance"],
+  ["연구재단 신진연구과제 영문 사사 문구", "acknowledgment"],
+  ["논문 Funding에 NRF 과제번호를 어떻게 쓰나", "acknowledgment"],
 ];
 
 let failed = 0;
@@ -78,3 +80,13 @@ if (travelResults.some((result) => String(result.id || "").startsWith("TRAVEL_EX
 }
 
 console.log(`PASS travel source ranking: ${travelResults[0].title}`);
+
+const acknowledgment = vm.runInContext(
+  `buildAnswer(detectTopic("연구재단 신진연구과제 영문 사사 문구"), [])`,
+  sandbox,
+);
+if (!acknowledgment.includes("NRF-2026S1A5A8003870") || acknowledgment.includes("NRF-2026003870")) {
+  console.error("FAIL acknowledgment uses an incorrect grant number");
+  process.exit(1);
+}
+console.log("PASS acknowledgment grant number and wording");

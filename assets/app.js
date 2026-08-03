@@ -30,10 +30,26 @@ const aliases = {
   기름값: ["주유비", "유류비", "자가운전", "출장여비"],
   연구재료비: ["연구재료", "검수", "검수확인서", "100만원", "연차별 1000만원", "2026"],
   논문게재료: ["논문게재료", "게재료", "APC", "연구개발기간 종료", "2년", "2026"],
+  사사: ["영문 사사", "논문 사사", "Acknowledgments", "Acknowledgement", "Funding", "NRF 과제번호"],
+  사사표기: ["영문 사사", "논문 사사", "사사 문구", "Acknowledgments", "Funding", "NRF-2026S1A5A8003870"],
   kci: ["KCI", "등재지", "등재후보지", "학술지", "논문인정"],
 };
 
 const topicTemplates = [
+  {
+    id: "acknowledgment",
+    priority: 150,
+    triggers: ["영문 사사", "논문 사사", "사사 표기", "사사표기", "사사 문구", "Acknowledgments", "Acknowledgement", "Funding 문구", "NRF 과제번호"],
+    boostTerms: ["2026S1A5A8003870", "NRF-2026S1A5A8003870", "신진연구자지원사업", "Ministry of Education", "National Research Foundation of Korea"],
+    title: "연구재단 신진연구과제 논문 사사",
+    rows: [
+      ["영문 사사", "This work was supported by the Ministry of Education of the Republic of Korea and the National Research Foundation of Korea (NRF-2026S1A5A8003870)."],
+      ["Funding 형식", "Funding: This work was supported by the Ministry of Education of the Republic of Korea and the National Research Foundation of Korea (NRF-2026S1A5A8003870)."],
+      ["국문 사사", "이 논문은 2026년 대한민국 교육부와 한국연구재단의 지원을 받아 수행된 연구임(NRF-2026S1A5A8003870)."],
+      ["과제정보", "신진연구자지원사업(인문사회), 과제번호 2026S1A5A8003870, 연구기간 2026.6.1.~2029.5.31."],
+      ["주의", "접수번호 2026003870은 사용하지 않습니다. 최종선정확인서의 과제번호 앞에 NRF-를 한 번만 붙여 표기합니다."],
+    ],
+  },
   {
     id: "budgetAdvance",
     priority: 130,
